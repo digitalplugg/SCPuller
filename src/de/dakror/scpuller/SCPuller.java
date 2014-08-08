@@ -256,7 +256,8 @@ public class SCPuller extends Activity
 		{
 			try
 			{
-				String content = getFileContents(new URL("http://api.soundcloud.com/resolve.json?client_id=" + SCPuller.cID + "&url=" + ((EditText) SCPuller.this.findViewById(R.id.link)).getText().toString()));
+				String content = getFileContents(new URL("https://api.soundcloud.com/resolve.json?client_id=" + SCPuller.cID + "&url=" + ((EditText) SCPuller.this.findViewById(R.id.link)).getText().toString()));
+				System.out.println(content);
 				JSONObject user = new JSONObject(content);
 				SCPuller.this.userID = user.getInt("id");
 				SCPuller.this.userName = user.getString("username");
@@ -265,6 +266,7 @@ public class SCPuller extends Activity
 			}
 			catch (Exception e)
 			{
+				e.printStackTrace();
 				return null;
 			}
 		}
