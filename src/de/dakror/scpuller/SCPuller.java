@@ -61,6 +61,8 @@ public class SCPuller extends Activity
 		if (action.equals(Intent.ACTION_SEND) && type != null && type.equals("text/plain"))
 		{
 			this.intentSong = intent.getStringExtra(Intent.EXTRA_TEXT);
+			this.intentSong = this.intentSong.substring(this.intentSong.indexOf("http://")); // fix for some newer version (date of fix: 05.01.15)
+			
 			String user = this.intentSong.substring(0, this.intentSong.lastIndexOf("/"));
 			EditText link = (EditText) SCPuller.this.findViewById(R.id.link);
 			link.setText(user);
