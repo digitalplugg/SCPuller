@@ -4,12 +4,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
-
+	
 	protected String mimeType;
 	protected byte pictureType;
 	protected EncodedText description;
 	protected byte[] imageData;
-
+	
 	public ID3v2PictureFrameData(boolean unsynchronisation) {
 		super(unsynchronisation);
 	}
@@ -21,7 +21,7 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 		this.description = description;
 		this.imageData = imageData;
 	}
-
+	
 	public ID3v2PictureFrameData(boolean unsynchronisation, byte[] bytes) throws InvalidDataException {
 		super(unsynchronisation);
 		synchroniseAndUnpackFrameData(bytes);
@@ -42,7 +42,7 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 		marker += 2;
 		int marker2 = BufferTools.indexOfTerminatorForEncoding(bytes, marker, bytes[0]);
 		if (marker2 >= 0) {
-			description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker , marker2 - marker));
+			description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker, marker2 - marker));
 			marker2 += description.getTerminator().length;
 		} else {
 			description = new EncodedText(bytes[0], "");
@@ -60,12 +60,11 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 			mimeTypeLength = mimeType.length();
 			try {
 				BufferTools.stringIntoByteBuffer(mimeType, 0, mimeTypeLength, bytes, 1);
-			} catch (UnsupportedEncodingException e) {
-			}
+			} catch (UnsupportedEncodingException e) {}
 		}
 		int marker = mimeTypeLength + 1;
 		bytes[marker++] = 0;
-		bytes[marker++] = pictureType; 
+		bytes[marker++] = pictureType;
 		if (description != null && description.toBytes().length > 0) {
 			byte[] descriptionBytes = description.toBytes(true, true);
 			BufferTools.copyIntoByteBuffer(descriptionBytes, 0, descriptionBytes.length, bytes, marker);
@@ -78,7 +77,7 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 		}
 		return bytes;
 	}
-
+	
 	protected int getLength() {
 		int length = 3;
 		if (mimeType != null) length += mimeType.length();
@@ -91,19 +90,19 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 	public String getMimeType() {
 		return mimeType;
 	}
-
+	
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
-
+	
 	public byte getPictureType() {
 		return pictureType;
 	}
-
+	
 	public void setPictureType(byte pictureType) {
 		this.pictureType = pictureType;
 	}
-
+	
 	public EncodedText getDescription() {
 		return description;
 	}
@@ -115,28 +114,28 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
 	public byte[] getImageData() {
 		return imageData;
 	}
-
+	
 	public void setImageData(byte[] imageData) {
 		this.imageData = imageData;
 	}
 	
 	public boolean equals(Object obj) {
-		if (! (obj instanceof ID3v2PictureFrameData)) return false;
-		if (! super.equals(obj)) return false;
+		if (!(obj instanceof ID3v2PictureFrameData)) return false;
+		if (!super.equals(obj)) return false;
 		ID3v2PictureFrameData other = (ID3v2PictureFrameData) obj;
 		if (pictureType != other.pictureType) return false;
 		if (mimeType == null) {
 			if (other.mimeType != null) return false;
 		} else if (other.mimeType == null) return false;
-		else if (! mimeType.equals(other.mimeType)) return false;
+		else if (!mimeType.equals(other.mimeType)) return false;
 		if (description == null) {
 			if (other.description != null) return false;
 		} else if (other.description == null) return false;
-		else if (! description.equals(other.description)) return false;
+		else if (!description.equals(other.description)) return false;
 		if (imageData == null) {
 			if (other.imageData != null) return false;
 		} else if (other.imageData == null) return false;
-		else if (! Arrays.equals(imageData, other.imageData)) return false;
+		else if (!Arrays.equals(imageData, other.imageData)) return false;
 		return true;
 	}
 }

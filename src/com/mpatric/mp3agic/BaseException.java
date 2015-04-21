@@ -1,7 +1,7 @@
 package com.mpatric.mp3agic;
 
 public class BaseException extends Exception {
-
+	
 	private static final long serialVersionUID = 1L;
 	
 	public BaseException() {
@@ -33,7 +33,7 @@ public class BaseException extends Exception {
 			} else {
 				break;
 			}
-		} 
+		}
 		return s.toString();
 	}
 }

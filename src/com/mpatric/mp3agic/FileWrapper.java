@@ -11,16 +11,15 @@ public class FileWrapper {
 	protected long length;
 	protected long lastModified;
 	
-	protected FileWrapper() {
-	}
-
+	protected FileWrapper() {}
+	
 	public FileWrapper(String filename) throws IOException {
 		this.filename = filename;
 		init();
 		length = file.length();
 		lastModified = file.lastModified();
 	}
-
+	
 	private void init() throws IOException {
 		file = new File(filename);
 		if (!file.exists()) throw new FileNotFoundException("File not found " + filename);
@@ -30,11 +29,11 @@ public class FileWrapper {
 	public String getFilename() {
 		return filename;
 	}
-
+	
 	public long getLength() {
 		return length;
 	}
-
+	
 	public long getLastModified() {
 		return lastModified;
 	}

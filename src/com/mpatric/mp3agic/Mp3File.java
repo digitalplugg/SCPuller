@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Mp3File extends FileWrapper {
-
+	
 	private static final int DEFAULT_BUFFER_LENGTH = 65536;
 	private static final int MINIMUM_BUFFER_LENGTH = 40;
 	private static final int XING_MARKER_OFFSET_1 = 13;
 	private static final int XING_MARKER_OFFSET_2 = 21;
 	private static final int XING_MARKER_OFFSET_3 = 36;
-
+	
 	protected int bufferLength;
 	private int xingOffset = -1;
 	private int startOffset = -1;
@@ -34,13 +34,12 @@ public class Mp3File extends FileWrapper {
 	private byte[] customTag;
 	private boolean scanFile;
 	
-	protected Mp3File() {
-	}
-
+	protected Mp3File() {}
+	
 	public Mp3File(String filename) throws IOException, UnsupportedTagException, InvalidDataException {
 		this(filename, DEFAULT_BUFFER_LENGTH, true);
 	}
-
+	
 	public Mp3File(String filename, int bufferLength) throws IOException, UnsupportedTagException, InvalidDataException {
 		this(filename, bufferLength, true);
 	}
@@ -49,14 +48,14 @@ public class Mp3File extends FileWrapper {
 		this(filename, DEFAULT_BUFFER_LENGTH, scanFile);
 	}
 	
-	public Mp3File(String filename, int bufferLength, boolean scanFile) throws IOException, UnsupportedTagException, InvalidDataException {		
+	public Mp3File(String filename, int bufferLength, boolean scanFile) throws IOException, UnsupportedTagException, InvalidDataException {
 		super(filename);
 		if (bufferLength < MINIMUM_BUFFER_LENGTH + 1) throw new IllegalArgumentException("Buffer too small");
 		this.bufferLength = bufferLength;
 		this.scanFile = scanFile;
 		init();
 	}
-
+	
 	private void init() throws IOException, UnsupportedTagException, InvalidDataException {
 		RandomAccessFile file = new RandomAccessFile(filename, "r");
 		try {
@@ -82,7 +81,9 @@ public class Mp3File extends FileWrapper {
 			if (bytesRead == AbstractID3v2Tag.HEADER_LENGTH) {
 				try {
 					ID3v2TagFactory.sanityCheckTag(bytes);
-					return AbstractID3v2Tag.HEADER_LENGTH + BufferTools.unpackSynchsafeInteger(bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 1], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 2], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 3]);
+					return AbstractID3v2Tag.HEADER_LENGTH
+							+ BufferTools.unpackSynchsafeInteger(	bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 1],
+																										bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 2], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 3]);
 				} catch (NoSuchTagException e) {
 					// do nothing
 				} catch (UnsupportedTagException e) {
@@ -94,7 +95,7 @@ public class Mp3File extends FileWrapper {
 		}
 		return 0;
 	}
-
+	
 	private void scanFile(RandomAccessFile file) throws IOException, InvalidDataException {
 		byte[] bytes = new byte[bufferLength];
 		int fileOffset = preScanFile(file);
@@ -110,7 +111,7 @@ public class Mp3File extends FileWrapper {
 						int offset = 0;
 						if (startOffset < 0) {
 							offset = scanBlockForStart(bytes, bytesRead, fileOffset, offset);
-							if (startOffset >= 0 && ! scanFile) {
+							if (startOffset >= 0 && !scanFile) {
 								return;
 							}
 							lastOffset = startOffset;
@@ -137,10 +138,10 @@ public class Mp3File extends FileWrapper {
 			}
 		}
 	}
-
+	
 	private int scanBlockForStart(byte[] bytes, int bytesRead, int absoluteOffset, int offset) {
 		while (offset < bytesRead - MINIMUM_BUFFER_LENGTH) {
-			if (bytes[offset] == (byte)0xFF && (bytes[offset + 1] & (byte)0xE0) == (byte)0xE0) {
+			if (bytes[offset] == (byte) 0xFF && (bytes[offset + 1] & (byte) 0xE0) == (byte) 0xE0) {
 				try {
 					MpegFrame frame = new MpegFrame(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
 					if (xingOffset < 0 && isXingFrame(bytes, offset)) {
@@ -188,13 +189,13 @@ public class Mp3File extends FileWrapper {
 		}
 		return offset;
 	}
-
+	
 	private int maxEndOffset() {
-		int maxEndOffset = (int)getLength();
+		int maxEndOffset = (int) getLength();
 		if (hasId3v1Tag()) maxEndOffset -= ID3v1Tag.TAG_LENGTH;
 		return maxEndOffset;
 	}
-
+	
 	private boolean isXingFrame(byte[] bytes, int offset) {
 		if (bytes.length >= offset + XING_MARKER_OFFSET_1 + 3) {
 			if ("Xing".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_1, 4))) return true;
@@ -213,8 +214,8 @@ public class Mp3File extends FileWrapper {
 	
 	private void sanityCheckFrame(MpegFrame frame, int offset) throws InvalidDataException {
 		if (sampleRate != frame.getSampleRate()) throw new InvalidDataException("Inconsistent frame header");
-		if (! layer.equals(frame.getLayer())) throw new InvalidDataException("Inconsistent frame header");
-		if (! version.equals(frame.getVersion())) throw new InvalidDataException("Inconsistent frame header");
+		if (!layer.equals(frame.getLayer())) throw new InvalidDataException("Inconsistent frame header");
+		if (!version.equals(frame.getVersion())) throw new InvalidDataException("Inconsistent frame header");
 		if (offset + frame.getLengthInBytes() > getLength()) throw new InvalidDataException("Frame would extend beyond end of file");
 	}
 	
@@ -261,23 +262,22 @@ public class Mp3File extends FileWrapper {
 	}
 	
 	private void initCustomTag(RandomAccessFile file) throws IOException {
-		int bufferLength = (int)(getLength() - (endOffset + 1));
+		int bufferLength = (int) (getLength() - (endOffset + 1));
 		if (hasId3v1Tag()) bufferLength -= ID3v1Tag.TAG_LENGTH;
 		if (bufferLength <= 0) {
 			customTag = null;
-		}
-		else {
+		} else {
 			customTag = new byte[bufferLength];
 			file.seek(endOffset + 1);
 			int bytesRead = file.read(customTag, 0, bufferLength);
 			if (bytesRead < bufferLength) throw new IOException("Not enough bytes read");
 		}
 	}
-
+	
 	public int getFrameCount() {
 		return frameCount;
 	}
-
+	
 	public int getStartOffset() {
 		return startOffset;
 	}
@@ -285,14 +285,14 @@ public class Mp3File extends FileWrapper {
 	public int getEndOffset() {
 		return endOffset;
 	}
-
+	
 	public long getLengthInMilliseconds() {
-		double d = 8 * (endOffset - startOffset); 
-		return (long)((d / bitrate) + 0.5); 
+		double d = 8 * (endOffset - startOffset);
+		return (long) ((d / bitrate) + 0.5);
 	}
 	
 	public long getLengthInSeconds() {
-		return ((getLengthInMilliseconds() + 500) / 1000); 
+		return ((getLengthInMilliseconds() + 500) / 1000);
 	}
 	
 	public boolean isVbr() {
@@ -300,41 +300,41 @@ public class Mp3File extends FileWrapper {
 	}
 	
 	public int getBitrate() {
-		return (int)(bitrate + 0.5);
+		return (int) (bitrate + 0.5);
 	}
 	
 	public Map<Integer, MutableInteger> getBitrates() {
 		return bitrates;
 	}
-
+	
 	public String getChannelMode() {
 		return channelMode;
 	}
-
+	
 	public boolean isCopyright() {
 		return copyright;
 	}
-
+	
 	public String getEmphasis() {
 		return emphasis;
 	}
-
+	
 	public String getLayer() {
 		return layer;
 	}
-
+	
 	public String getModeExtension() {
 		return modeExtension;
 	}
-
+	
 	public boolean isOriginal() {
 		return original;
 	}
-
+	
 	public int getSampleRate() {
 		return sampleRate;
 	}
-
+	
 	public String getVersion() {
 		return version;
 	}
@@ -342,7 +342,7 @@ public class Mp3File extends FileWrapper {
 	public boolean hasXingFrame() {
 		return (xingOffset >= 0);
 	}
-
+	
 	public int getXingOffset() {
 		return xingOffset;
 	}
@@ -354,11 +354,11 @@ public class Mp3File extends FileWrapper {
 	public boolean hasId3v1Tag() {
 		return id3v1Tag != null;
 	}
-
+	
 	public ID3v1 getId3v1Tag() {
 		return id3v1Tag;
 	}
-
+	
 	public void setId3v1Tag(ID3v1 id3v1Tag) {
 		this.id3v1Tag = id3v1Tag;
 	}
@@ -370,11 +370,11 @@ public class Mp3File extends FileWrapper {
 	public boolean hasId3v2Tag() {
 		return id3v2Tag != null;
 	}
-
+	
 	public ID3v2 getId3v2Tag() {
 		return id3v2Tag;
 	}
-
+	
 	public void setId3v2Tag(ID3v2 id3v2Tag) {
 		this.id3v2Tag = id3v2Tag;
 	}
@@ -386,11 +386,11 @@ public class Mp3File extends FileWrapper {
 	public boolean hasCustomTag() {
 		return customTag != null;
 	}
-
+	
 	public byte[] getCustomTag() {
 		return customTag;
 	}
-
+	
 	public void setCustomTag(byte[] customTag) {
 		this.customTag = customTag;
 	}
@@ -419,7 +419,7 @@ public class Mp3File extends FileWrapper {
 			saveFile.close();
 		}
 	}
-
+	
 	private void saveMpegFrames(RandomAccessFile saveFile) throws IOException {
 		int filePos = xingOffset;
 		if (filePos < 0) filePos = startOffset;

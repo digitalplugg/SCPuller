@@ -26,6 +26,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -38,8 +39,7 @@ import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.Mp3File;
 
-public class SCPuller extends Activity
-{
+public class SCPuller extends Activity {
 	public static final String cID = "da71cf8b29a850e6d978adc9f502763e";
 	
 	private int userID;
@@ -50,31 +50,32 @@ public class SCPuller extends Activity
 	ArrayList<Integer> downloadedSongs = new ArrayList<Integer>();
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_scpuller);
 		// -- Check if from intent -- //
 		Intent intent = getIntent();
 		String action = intent.getAction();
 		String type = intent.getType();
-		if (action.equals(Intent.ACTION_SEND) && type != null && type.equals("text/plain"))
-		{
-			this.intentSong = intent.getStringExtra(Intent.EXTRA_TEXT);
-			this.intentSong = this.intentSong.substring(this.intentSong.indexOf("http://")); // fix for some newer version (date of fix: 05.01.15)
+		if (action.equals(Intent.ACTION_SEND) && type != null && type.equals("text/plain")) {
+			intentSong = intent.getStringExtra(Intent.EXTRA_TEXT);
 			
-			String user = this.intentSong.substring(0, this.intentSong.lastIndexOf("/"));
+			Log.i("SCPuller", String.format("INTENT EXTRA: %s", intentSong));
+			
+			intentSong = intentSong.substring(intentSong.indexOf("http")); // fix for some newer version (date of fix: 05.01.15)
+			
+			Log.i("SCPuller", intentSong);
+			
+			String user = intentSong.substring(0, intentSong.lastIndexOf("/"));
 			EditText link = (EditText) SCPuller.this.findViewById(R.id.link);
 			link.setText(user);
 			new JSONHelper().execute();
 		}
 		// -- //
 		final Button find = (Button) findViewById(R.id.find);
-		find.setOnClickListener(new View.OnClickListener()
-		{
+		find.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				new JSONHelper().execute();
 			}
 		});
@@ -82,14 +83,11 @@ public class SCPuller extends Activity
 		loadDownloadedSongs();
 	}
 	
-	public void loadDownloadedSongs()
-	{
+	public void loadDownloadedSongs() {
 		File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "SC Puller/downloaded.txt");
 		if (!f.exists()) return;
-		else
-		{
-			try
-			{
+		else {
+			try {
 				downloadedSongs.clear();
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line = "";
@@ -97,188 +95,148 @@ public class SCPuller extends Activity
 					downloadedSongs.add(Integer.parseInt(line));
 				
 				br.close();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void saveDownloadedSongs()
-	{
+	public void saveDownloadedSongs() {
 		File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "SC Puller/downloaded.txt");
-		try
-		{
+		try {
 			f.createNewFile();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 			for (int i : downloadedSongs)
 				bw.write(i + "\r\n");
 			
 			bw.close();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void proceedFindClick(String result)
-	{
-		if (result == null)
-		{
+	public void proceedFindClick(String result) {
+		if (result == null) {
 			Toast.makeText(this, "Either this link is not valid or you aren't connected to the internet!", Toast.LENGTH_LONG).show();
 			return;
 		}
 		final ScrollView songsScrollView = (ScrollView) findViewById(R.id.songsScrollView);
 		ProgressDialog pd = ProgressDialog.show(this, "", "Loading songs. Please wait...", false);
 		
-		this.allSongs = null;
+		allSongs = null;
 		
-		try
-		{
-			this.allSongs = new JSONArray(result);
-		}
-		catch (JSONException e1)
-		{
+		try {
+			allSongs = new JSONArray(result);
+		} catch (JSONException e1) {
 			e1.printStackTrace();
 			System.exit(0);
 		}
 		
 		pd.dismiss();
-		if (this.allSongs == null)
-		{
+		if (allSongs == null) {
 			return;
-		}
-		else if (this.allSongs.length() == 0)
-		{
+		} else if (allSongs.length() == 0) {
 			Toast.makeText(this, "This user has no public songs yet!", Toast.LENGTH_LONG).show();
 		}
 		songsScrollView.removeAllViews();
-		this.ll = new LinearLayout(this);
-		this.ll.setOrientation(LinearLayout.VERTICAL);
+		ll = new LinearLayout(this);
+		ll.setOrientation(LinearLayout.VERTICAL);
 		
-		for (int i = 0; i < this.allSongs.length(); i++)
-		{
-			try
-			{
-				JSONObject o = this.allSongs.getJSONObject(i);
+		for (int i = 0; i < allSongs.length(); i++) {
+			try {
+				JSONObject o = allSongs.getJSONObject(i);
 				CheckBox song = new CheckBox(this);
 				song.setText(o.getString("title"));
 				song.setChecked(!downloadedSongs.contains(o.getInt("id")));
 				if (downloadedSongs.contains(o.getInt("id"))) song.setBackgroundColor(Color.GRAY);
-				this.ll.addView(song);
-			}
-			catch (JSONException e)
-			{
+				ll.addView(song);
+			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
-		songsScrollView.addView(this.ll);
+		songsScrollView.addView(ll);
 		Button selectall = (Button) findViewById(R.id.selectall);
-		selectall.setOnClickListener(new View.OnClickListener()
-		{
+		selectall.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				if (ll == null) return;
 				int childcount = ll.getChildCount();
-				for (int i = 0; i < childcount; i++)
-				{
+				for (int i = 0; i < childcount; i++) {
 					CheckBox cb = (CheckBox) ll.getChildAt(i);
 					cb.setChecked(true);
 				}
 			}
 		});
 		Button selectnone = (Button) findViewById(R.id.selectnone);
-		selectnone.setOnClickListener(new View.OnClickListener()
-		{
+		selectnone.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				if (ll == null) return;
 				int childcount = ll.getChildCount();
-				for (int i = 0; i < childcount; i++)
-				{
+				for (int i = 0; i < childcount; i++) {
 					CheckBox cb = (CheckBox) ll.getChildAt(i);
 					cb.setChecked(false);
 				}
 			}
 		});
 		Button download = (Button) findViewById(R.id.download);
-		download.setOnClickListener(new View.OnClickListener()
-		{
+		download.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				new DownloadHelper().execute(null, null);
 			}
 		});
-		if (this.intentSong != null)
-		{
+		if (intentSong != null) {
 			// -- deselect all -- //
-			int childcount = this.ll.getChildCount();
-			for (int i = 0; i < childcount; i++)
-			{
-				CheckBox cb = (CheckBox) this.ll.getChildAt(i);
+			int childcount = ll.getChildCount();
+			for (int i = 0; i < childcount; i++) {
+				CheckBox cb = (CheckBox) ll.getChildAt(i);
 				cb.setChecked(false);
 			}
 			// -- select intented -- //
-			try
-			{
-				for (int i = 0; i < this.allSongs.length(); i++)
-				{
-					JSONObject song = this.allSongs.getJSONObject(i);
-					if (song.getString("permalink_url").equals(this.intentSong))
-					{
-						CheckBox cb = (CheckBox) this.ll.getChildAt(i);
+			try {
+				for (int i = 0; i < allSongs.length(); i++) {
+					JSONObject song = allSongs.getJSONObject(i);
+					if (song.getString("permalink_url").replace("http", "https").equals(intentSong)) {
+						CheckBox cb = (CheckBox) ll.getChildAt(i);
 						cb.setChecked(true);
 					}
 				}
-			}
-			catch (JSONException e)
-			{
+			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	class JSONHelper extends AsyncTask<String, Void, String>
-	{
+	class JSONHelper extends AsyncTask<String, Void, String> {
 		ProgressDialog pd;
 		
 		@Override
-		protected void onPreExecute()
-		{
+		protected void onPreExecute() {
 			pd = ProgressDialog.show(SCPuller.this, "", "Loading songs. Please wait...", true);
 		}
 		
 		@Override
-		protected String doInBackground(String... params)
-		{
-			try
-			{
-				String content = getFileContents(new URL("https://api.soundcloud.com/resolve.json?client_id=" + SCPuller.cID + "&url=" + ((EditText) SCPuller.this.findViewById(R.id.link)).getText().toString()));
+		protected String doInBackground(String... params) {
+			try {
+				String content = getFileContents(new URL("https://api.soundcloud.com/resolve.json?client_id=" + SCPuller.cID + "&url="
+						+ ((EditText) findViewById(R.id.link)).getText().toString()));
 				System.out.println(content);
 				JSONObject user = new JSONObject(content);
-				SCPuller.this.userID = user.getInt("id");
-				SCPuller.this.userName = user.getString("username");
-				String result = getFileContents(new URL("http://dakror.de/AndroidSCPuller/getallsongs.php?uid=" + SCPuller.this.userID));
+				userID = user.getInt("id");
+				userName = user.getString("username");
+				String result = getFileContents(new URL("http://dakror.de/AndroidSCPuller/getallsongs.php?uid=" + userID));
 				return result;
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
 		}
 		
-		protected String getFileContents(URL u) throws IOException
-		{
+		protected String getFileContents(URL u) throws IOException {
 			String res = "", line = "";
 			BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream()));
-			while ((line = br.readLine()) != null)
-			{
+			while ((line = br.readLine()) != null) {
 				res += line;
 			}
 			br.close();
@@ -286,24 +244,21 @@ public class SCPuller extends Activity
 		}
 		
 		@Override
-		protected void onPostExecute(String result)
-		{
+		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			pd.dismiss();
-			SCPuller.this.proceedFindClick(result);
+			proceedFindClick(result);
 		}
 	}
 	
-	class DownloadHelper extends AsyncTask<Void, Integer, Void>
-	{
+	class DownloadHelper extends AsyncTask<Void, Integer, Void> {
 		ProgressDialog pd;
 		long totalSize = 0;
 		long totalProg = 0;
 		
 		@SuppressLint("NewApi")
 		@Override
-		protected void onPreExecute()
-		{
+		protected void onPreExecute() {
 			pd = new ProgressDialog(SCPuller.this);
 			pd.setMessage("Downloading songs. Please wait..");
 			pd.setProgressNumberFormat(null);
@@ -315,52 +270,40 @@ public class SCPuller extends Activity
 		}
 		
 		@Override
-		protected Void doInBackground(Void... params)
-		{
+		protected Void doInBackground(Void... params) {
 			File parent = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
-			File dest = new File(parent, "SC Puller/" + SCPuller.this.userName);
+			File dest = new File(parent, "SC Puller/" + userName);
 			dest.mkdirs();
-			if (SCPuller.this.ll == null) return null;
-			int childcount = SCPuller.this.ll.getChildCount();
-			for (int i = 0; i < childcount; i++)
-			{
-				if (!((CheckBox) SCPuller.this.ll.getChildAt(i)).isChecked()) continue;
-				try
-				{
-					this.totalSize += new URL(SCPuller.this.allSongs.getJSONObject(i).getString("stream_url") + "?client_id=" + cID).openConnection().getContentLength();
-				}
-				catch (Exception e)
-				{
+			if (ll == null) return null;
+			int childcount = ll.getChildCount();
+			for (int i = 0; i < childcount; i++) {
+				if (!((CheckBox) ll.getChildAt(i)).isChecked()) continue;
+				try {
+					totalSize += new URL(allSongs.getJSONObject(i).getString("stream_url") + "?client_id=" + cID).openConnection().getContentLength();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 			pd.setIndeterminate(false);
-			for (int i = 0; i < childcount; i++)
-			{
-				CheckBox cb = (CheckBox) SCPuller.this.ll.getChildAt(i);
-				if (cb.isChecked())
-				{
+			for (int i = 0; i < childcount; i++) {
+				CheckBox cb = (CheckBox) ll.getChildAt(i);
+				if (cb.isChecked()) {
 					File ftemp = new File(dest, cb.getText().toString().replaceAll("[^\\w ]", "") + ".mp3.tmp");
 					File file = new File(dest, cb.getText().toString().replaceAll("[^\\w ]", "") + ".mp3");
-					try
-					{
-						JSONObject d = SCPuller.this.allSongs.getJSONObject(i);
+					try {
+						JSONObject d = allSongs.getJSONObject(i);
 						ftemp.createNewFile();
 						String stream_url = d.getString("stream_url");
-						if (stream_url.length() > 0)
-						{
+						if (stream_url.length() > 0) {
 							download(new URL(stream_url + "?client_id=" + cID), new FileOutputStream(ftemp));
 							
 							downloadedSongs.add(d.getInt("id"));
 							
 							Mp3File f = new Mp3File(ftemp.getPath());
 							ID3v2 id3v2;
-							if (f.hasId3v2Tag())
-							{
+							if (f.hasId3v2Tag()) {
 								id3v2 = f.getId3v2Tag();
-							}
-							else
-							{
+							} else {
 								id3v2 = new ID3v24Tag();
 								f.setId3v2Tag(id3v2);
 							}
@@ -370,33 +313,24 @@ public class SCPuller extends Activity
 							id3v2.setComment(d.getString("description"));
 							id3v2.setOriginalArtist(d.getJSONObject("user").getString("username"));
 							id3v2.setTitle(d.getString("title"));
-							try
-							{
+							try {
 								id3v2.setYear("" + d.getInt("release_year"));
-							}
-							catch (Exception e)
-							{}
-							try
-							{
+							} catch (Exception e) {}
+							try {
 								String artwork = (d.has("artwork_url")) ? d.getString("artwork_url") : null;
 								
-								if (artwork != null && !artwork.equals("null"))
-								{
+								if (artwork != null && !artwork.equals("null")) {
 									ByteArrayOutputStream baos = new ByteArrayOutputStream();
 									copyInputStream(new URL(artwork.replace("large", "t500x500")).openStream(), baos);
 									id3v2.setAlbumImage(baos.toByteArray(), "image/jpeg");
 								}
-							}
-							catch (Exception e)
-							{
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
 							f.save(file.getPath());
 							ftemp.delete();
 						}
-					}
-					catch (Exception e)
-					{
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -404,15 +338,13 @@ public class SCPuller extends Activity
 			return null;
 		}
 		
-		public synchronized void download(URL in, OutputStream out) throws Exception
-		{
+		public synchronized void download(URL in, OutputStream out) throws Exception {
 			InputStream is = in.openStream();
 			byte[] buffer = new byte[2048];
 			int len = is.read(buffer);
 			int prog = 0;
 			int fullsize = in.openConnection().getContentLength();
-			while (prog != fullsize)
-			{
+			while (prog != fullsize) {
 				prog += len;
 				out.write(buffer, 0, len);
 				len = is.read(buffer);
@@ -423,12 +355,10 @@ public class SCPuller extends Activity
 			out.close();
 		}
 		
-		public synchronized void copyInputStream(InputStream is, OutputStream out) throws Exception
-		{
+		public synchronized void copyInputStream(InputStream is, OutputStream out) throws Exception {
 			byte[] buffer = new byte[2048];
 			int len = is.read(buffer);
-			while (len != -1)
-			{
+			while (len != -1) {
 				out.write(buffer, 0, len);
 				len = is.read(buffer);
 			}
@@ -437,14 +367,12 @@ public class SCPuller extends Activity
 		}
 		
 		@Override
-		protected void onProgressUpdate(Integer... progress)
-		{
+		protected void onProgressUpdate(Integer... progress) {
 			pd.setProgress(progress[0]);
 		}
 		
 		@Override
-		protected void onPostExecute(Void result)
-		{
+		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
 			saveDownloadedSongs();

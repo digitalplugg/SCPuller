@@ -3,13 +3,13 @@ package com.mpatric.mp3agic;
 import java.io.UnsupportedEncodingException;
 
 public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
-
+	
 	private static final String DEFAULT_LANGUAGE = "eng";
 	
 	private String language;
 	private EncodedText description;
 	private EncodedText comment;
-
+	
 	public ID3v2CommentFrameData(boolean unsynchronisation) {
 		super(unsynchronisation);
 	}
@@ -20,7 +20,7 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 		this.description = description;
 		this.comment = comment;
 	}
-
+	
 	public ID3v2CommentFrameData(boolean unsynchronisation, byte[] bytes) throws InvalidDataException {
 		super(unsynchronisation);
 		synchroniseAndUnpackFrameData(bytes);
@@ -42,7 +42,7 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 		}
 		comment = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker, bytes.length - marker));
 	}
-
+	
 	protected byte[] packFrameData() {
 		byte[] bytes = new byte[getLength()];
 		if (comment != null) bytes[0] = comment.getTextEncoding();
@@ -57,8 +57,7 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 		}
 		try {
 			BufferTools.stringIntoByteBuffer(langPadded, 0, 3, bytes, 1);
-		} catch (UnsupportedEncodingException e) {
-		}
+		} catch (UnsupportedEncodingException e) {}
 		int marker = 4;
 		if (description != null) {
 			byte[] descriptionBytes = description.toBytes(true, true);
@@ -73,7 +72,7 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 		}
 		return bytes;
 	}
-
+	
 	protected int getLength() {
 		int length = 4;
 		if (description != null) length += description.toBytes(true, true).length;
@@ -85,7 +84,7 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 	public String getLanguage() {
 		return language;
 	}
-
+	
 	public void setLanguage(String language) {
 		this.language = language;
 	}
@@ -93,35 +92,35 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 	public EncodedText getComment() {
 		return comment;
 	}
-
+	
 	public void setComment(EncodedText comment) {
 		this.comment = comment;
 	}
-
+	
 	public EncodedText getDescription() {
 		return description;
 	}
-
+	
 	public void setDescription(EncodedText description) {
 		this.description = description;
 	}
 	
 	public boolean equals(Object obj) {
-		if (! (obj instanceof ID3v2CommentFrameData)) return false;
-		if (! super.equals(obj)) return false;
+		if (!(obj instanceof ID3v2CommentFrameData)) return false;
+		if (!super.equals(obj)) return false;
 		ID3v2CommentFrameData other = (ID3v2CommentFrameData) obj;
 		if (language == null) {
 			if (other.language != null) return false;
 		} else if (other.language == null) return false;
-		else if (! language.equals(other.language)) return false;
+		else if (!language.equals(other.language)) return false;
 		if (description == null) {
 			if (other.description != null) return false;
 		} else if (other.description == null) return false;
-		else if (! description.equals(other.description)) return false;
+		else if (!description.equals(other.description)) return false;
 		if (comment == null) {
 			if (other.comment != null) return false;
 		} else if (other.comment == null) return false;
-		else if (! comment.equals(other.comment)) return false;
+		else if (!comment.equals(other.comment)) return false;
 		return true;
 	}
 }

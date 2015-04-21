@@ -52,7 +52,7 @@ public class BufferTools {
 			System.arraycopy(srcBytes, 0, bytes, destOffset, srcBytes.length);
 		}
 	}
-
+	
 	public static String trimStringRight(String s) {
 		int endPosition = s.length() - 1;
 		char endChar;
@@ -60,7 +60,7 @@ public class BufferTools {
 			endChar = s.charAt(endPosition);
 			if (endChar > 32) {
 				break;
-			} 
+			}
 			endPosition--;
 		}
 		if (endPosition == s.length() - 1) return s;
@@ -76,7 +76,7 @@ public class BufferTools {
 		}
 		return stringBuffer.toString();
 	}
-
+	
 	public static boolean checkBit(byte b, int bitPosition) {
 		return ((b & (0x01 << bitPosition)) != 0);
 	}
@@ -84,9 +84,9 @@ public class BufferTools {
 	public static byte setBit(byte b, int bitPosition, boolean value) {
 		byte newByte;
 		if (value) {
-			newByte = (byte) (b | ((byte)0x01 << bitPosition));
+			newByte = (byte) (b | ((byte) 0x01 << bitPosition));
 		} else {
-			newByte = (byte) (b & (~ ((byte)0x01 << bitPosition)));
+			newByte = (byte) (b & (~((byte) 0x01 << bitPosition)));
 		}
 		return newByte;
 	}
@@ -119,10 +119,10 @@ public class BufferTools {
 	}
 	
 	public static int unpackSynchsafeInteger(byte b1, byte b2, byte b3, byte b4) {
-		int value = ((byte)(b4 & 0x7f));
-		value += shiftByte((byte)(b3 & 0x7f), -7);
-		value += shiftByte((byte)(b2 & 0x7f), -14);
-		value += shiftByte((byte)(b1 & 0x7f), -21);
+		int value = ((byte) (b4 & 0x7f));
+		value += shiftByte((byte) (b3 & 0x7f), -7);
+		value += shiftByte((byte) (b2 & 0x7f), -14);
+		value += shiftByte((byte) (b1 & 0x7f), -21);
 		return value;
 	}
 	
@@ -138,7 +138,7 @@ public class BufferTools {
 		bytes[offset + 1] = (byte) ((i >> 14) & 0x7f);
 		bytes[offset + 0] = (byte) ((i >> 21) & 0x7f);
 	}
-
+	
 	public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
 		byte[] copy = new byte[length];
 		if (length > 0) {
@@ -154,48 +154,48 @@ public class BufferTools {
 	}
 	
 	public static int sizeUnsynchronisationWouldAdd(byte[] bytes) {
-		int count = 0; 
+		int count = 0;
 		for (int i = 0; i < bytes.length - 1; i++) {
-			if (bytes[i] == (byte)0xff && ((bytes[i + 1] & (byte)0xe0) == (byte)0xe0 || bytes[i + 1] == 0)) {
+			if (bytes[i] == (byte) 0xff && ((bytes[i + 1] & (byte) 0xe0) == (byte) 0xe0 || bytes[i + 1] == 0)) {
 				count++;
 			}
 		}
-		if (bytes.length > 0 && bytes[bytes.length - 1] == (byte)0xff) count++;
+		if (bytes.length > 0 && bytes[bytes.length - 1] == (byte) 0xff) count++;
 		return count;
 	}
-
+	
 	public static byte[] unsynchroniseBuffer(byte[] bytes) {
 		// unsynchronisation is replacing instances of:
 		// 11111111 111xxxxx with 11111111 00000000 111xxxxx and
-		// 11111111 00000000 with 11111111 00000000 00000000 
+		// 11111111 00000000 with 11111111 00000000 00000000
 		int count = sizeUnsynchronisationWouldAdd(bytes);
 		if (count == 0) return bytes;
 		byte[] newBuffer = new byte[bytes.length + count];
 		int j = 0;
 		for (int i = 0; i < bytes.length - 1; i++) {
 			newBuffer[j++] = bytes[i];
-			if (bytes[i] == (byte)0xff && ((bytes[i + 1] & (byte)0xe0) == (byte)0xe0 || bytes[i + 1] == 0)) {
+			if (bytes[i] == (byte) 0xff && ((bytes[i + 1] & (byte) 0xe0) == (byte) 0xe0 || bytes[i + 1] == 0)) {
 				newBuffer[j++] = 0;
 			}
 		}
 		newBuffer[j++] = bytes[bytes.length - 1];
-		if (bytes[bytes.length - 1] == (byte)0xff) {
+		if (bytes[bytes.length - 1] == (byte) 0xff) {
 			newBuffer[j++] = 0;
 		}
 		return newBuffer;
 	}
 	
 	public static int sizeSynchronisationWouldSubtract(byte[] bytes) {
-		int count = 0; 
+		int count = 0;
 		for (int i = 0; i < bytes.length - 2; i++) {
-			if (bytes[i] == (byte)0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte)0xe0) == (byte)0xe0 || bytes[i + 2] == 0)) {
+			if (bytes[i] == (byte) 0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte) 0xe0) == (byte) 0xe0 || bytes[i + 2] == 0)) {
 				count++;
 			}
 		}
-		if (bytes.length > 1 && bytes[bytes.length - 2] == (byte)0xff && bytes[bytes.length - 1] == 0) count++;
+		if (bytes.length > 1 && bytes[bytes.length - 2] == (byte) 0xff && bytes[bytes.length - 1] == 0) count++;
 		return count;
 	}
-
+	
 	public static byte[] synchroniseBuffer(byte[] bytes) {
 		// synchronisation is replacing instances of:
 		// 11111111 00000000 111xxxxx with 11111111 111xxxxx and
@@ -206,7 +206,7 @@ public class BufferTools {
 		int i = 0;
 		for (int j = 0; j < newBuffer.length - 1; j++) {
 			newBuffer[j] = bytes[i];
-			if (bytes[i] == (byte)0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte)0xe0) == (byte)0xe0 || bytes[i + 2] == 0)) {
+			if (bytes[i] == (byte) 0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte) 0xe0) == (byte) 0xe0 || bytes[i + 2] == 0)) {
 				i++;
 			}
 			i++;
@@ -214,7 +214,7 @@ public class BufferTools {
 		newBuffer[newBuffer.length - 1] = bytes[i];
 		return newBuffer;
 	}
-
+	
 	public static String substitute(String s, String replaceThis, String withThis) {
 		if (replaceThis.length() < 1 || s.indexOf(replaceThis) < 0) {
 			return s;
@@ -237,7 +237,7 @@ public class BufferTools {
 		}
 		return newString.toString();
 	}
-
+	
 	public static String asciiOnly(String s) {
 		StringBuffer newString = new StringBuffer();
 		for (int i = 0; i < s.length(); i++) {

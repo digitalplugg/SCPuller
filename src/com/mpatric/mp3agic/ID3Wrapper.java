@@ -1,10 +1,10 @@
 package com.mpatric.mp3agic;
 
 public class ID3Wrapper {
-
+	
 	private ID3v1 id3v1Tag;
 	private ID3v2 id3v2Tag;
-
+	
 	public ID3Wrapper(ID3v1 id3v1Tag, ID3v2 id3v2Tag) {
 		this.id3v1Tag = id3v1Tag;
 		this.id3v2Tag = id3v2Tag;
@@ -13,11 +13,11 @@ public class ID3Wrapper {
 	public ID3v1 getId3v1Tag() {
 		return id3v1Tag;
 	}
-
+	
 	public ID3v2 getId3v2Tag() {
 		return id3v2Tag;
 	}
-
+	
 	public String getTrack() {
 		if (id3v2Tag != null && id3v2Tag.getTrack() != null && id3v2Tag.getTrack().length() > 0) {
 			return id3v2Tag.getTrack();
@@ -27,7 +27,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setTrack(String track) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setTrack(track);
@@ -36,7 +36,7 @@ public class ID3Wrapper {
 			id3v1Tag.setTrack(track);
 		}
 	}
-
+	
 	public String getArtist() {
 		if (id3v2Tag != null && id3v2Tag.getArtist() != null && id3v2Tag.getArtist().length() > 0) {
 			return id3v2Tag.getArtist();
@@ -46,7 +46,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setArtist(String artist) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setArtist(artist);
@@ -65,7 +65,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setTitle(String title) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setTitle(title);
@@ -74,7 +74,7 @@ public class ID3Wrapper {
 			id3v1Tag.setTitle(title);
 		}
 	}
-
+	
 	public String getAlbum() {
 		if (id3v2Tag != null && id3v2Tag.getAlbum() != null && id3v2Tag.getAlbum().length() > 0) {
 			return id3v2Tag.getAlbum();
@@ -84,7 +84,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setAlbum(String album) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setAlbum(album);
@@ -103,7 +103,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setYear(String year) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setYear(year);
@@ -112,7 +112,7 @@ public class ID3Wrapper {
 			id3v1Tag.setYear(year);
 		}
 	}
-
+	
 	public int getGenre() {
 		if (id3v1Tag != null && id3v1Tag.getGenre() != -1) {
 			return id3v1Tag.getGenre();
@@ -122,7 +122,7 @@ public class ID3Wrapper {
 			return -1;
 		}
 	}
-
+	
 	public void setGenre(int genre) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setGenre(genre);
@@ -151,7 +151,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setComment(String comment) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setComment(comment);
@@ -160,7 +160,7 @@ public class ID3Wrapper {
 			id3v1Tag.setComment(comment);
 		}
 	}
-
+	
 	public String getComposer() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getComposer();
@@ -168,7 +168,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setComposer(String composer) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setComposer(composer);
@@ -182,19 +182,19 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setOriginalArtist(String originalArtist) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setOriginalArtist(originalArtist);
 		}
 	}
-
+	
 	public void setAlbumArtist(String albumArtist) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setAlbumArtist(albumArtist);
 		}
 	}
-
+	
 	public String getAlbumArtist() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getAlbumArtist();
@@ -202,7 +202,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public String getCopyright() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getCopyright();
@@ -210,13 +210,13 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setCopyright(String copyright) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setCopyright(copyright);
 		}
 	}
-
+	
 	public String getUrl() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getUrl();
@@ -224,13 +224,13 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setUrl(String url) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setUrl(url);
 		}
 	}
-
+	
 	public String getEncoder() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getEncoder();
@@ -238,7 +238,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setEncoder(String encoder) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setEncoder(encoder);
@@ -252,13 +252,13 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void setAlbumImage(byte[] albumImage, String mimeType) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setAlbumImage(albumImage, mimeType);
 		}
 	}
-
+	
 	public String getAlbumImageMimeType() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getAlbumImageMimeType();
@@ -266,7 +266,7 @@ public class ID3Wrapper {
 			return null;
 		}
 	}
-
+	
 	public void clearComment() {
 		if (id3v2Tag != null) {
 			id3v2Tag.clearFrameSet(AbstractID3v2Tag.ID_COMMENT);
@@ -275,13 +275,13 @@ public class ID3Wrapper {
 			id3v1Tag.setComment(null);
 		}
 	}
-
+	
 	public void clearCopyright() {
 		if (id3v2Tag != null) {
 			id3v2Tag.clearFrameSet(AbstractID3v2Tag.ID_COPYRIGHT);
 		}
 	}
-
+	
 	public void clearEncoder() {
 		if (id3v2Tag != null) {
 			id3v2Tag.clearFrameSet(AbstractID3v2Tag.ID_ENCODER);

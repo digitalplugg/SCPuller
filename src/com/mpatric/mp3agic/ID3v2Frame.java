@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class ID3v2Frame {
-
+	
 	private static final int HEADER_LENGTH = 10;
 	private static final int ID_OFFSET = 0;
 	private static final int ID_LENGTH = 4;
@@ -19,7 +19,7 @@ public class ID3v2Frame {
 	private static final int ENCRYPTION_BIT = 2;
 	private static final int UNSYNCHRONISATION_BIT = 1;
 	private static final int DATA_LENGTH_INDICATOR_BIT = 0;
-
+	
 	protected String id;
 	protected int dataLength = 0;
 	protected byte[] data = null;
@@ -31,23 +31,23 @@ public class ID3v2Frame {
 	private boolean encryption = false;
 	private boolean unsynchronisation = false;
 	private boolean dataLengthIndicator = false;
-
+	
 	public ID3v2Frame(byte[] buffer, int offset) throws InvalidDataException {
 		unpackFrame(buffer, offset);
 	}
-
+	
 	public ID3v2Frame(String id, byte[] data) {
 		this.id = id;
 		this.data = data;
 		dataLength = data.length;
 	}
-
+	
 	protected void unpackFrame(byte[] buffer, int offset) throws InvalidDataException {
 		int dataOffset = unpackHeader(buffer, offset);
 		sanityCheckUnpackedHeader();
 		data = BufferTools.copyBuffer(buffer, dataOffset, dataLength);
 	}
-
+	
 	protected int unpackHeader(byte[] buffer, int offset) {
 		id = BufferTools.byteBufferToStringIgnoringEncodingIssues(buffer, offset + ID_OFFSET, ID_LENGTH);
 		unpackDataLength(buffer, offset);
@@ -56,9 +56,10 @@ public class ID3v2Frame {
 	}
 	
 	protected void unpackDataLength(byte[] buffer, int offset) {
-		dataLength = BufferTools.unpackInteger(buffer[offset + DATA_LENGTH_OFFSET], buffer[offset + DATA_LENGTH_OFFSET + 1], buffer[offset + DATA_LENGTH_OFFSET + 2], buffer[offset + DATA_LENGTH_OFFSET + 3]);
+		dataLength = BufferTools.unpackInteger(buffer[offset + DATA_LENGTH_OFFSET], buffer[offset + DATA_LENGTH_OFFSET + 1], buffer[offset + DATA_LENGTH_OFFSET + 2], buffer[offset
+				+ DATA_LENGTH_OFFSET + 3]);
 	}
-
+	
 	private void unpackFlags(byte[] buffer, int offset) {
 		preserveTag = BufferTools.checkBit(buffer[offset + FLAGS1_OFFSET], PRESERVE_TAG_BIT);
 		preserveFile = BufferTools.checkBit(buffer[offset + FLAGS1_OFFSET], PRESERVE_FILE_BIT);
@@ -72,7 +73,7 @@ public class ID3v2Frame {
 	
 	protected void sanityCheckUnpackedHeader() throws InvalidDataException {
 		for (int i = 0; i < id.length(); i++) {
-			if (! ((id.charAt(i) >= 'A' && id.charAt(i) <= 'Z') || (id.charAt(i) >= '0' && id.charAt(i) <= '9'))) {
+			if (!((id.charAt(i) >= 'A' && id.charAt(i) <= 'Z') || (id.charAt(i) >= '0' && id.charAt(i) <= '9'))) {
 				throw new InvalidDataException("Not a valid frame - invalid tag " + id);
 			}
 		}
@@ -92,16 +93,15 @@ public class ID3v2Frame {
 		packHeader(bytes, offset);
 		BufferTools.copyIntoByteBuffer(data, 0, data.length, bytes, offset + HEADER_LENGTH);
 	}
-
+	
 	private void packHeader(byte[] bytes, int i) {
 		try {
 			BufferTools.stringIntoByteBuffer(id, 0, id.length(), bytes, 0);
-		} catch (UnsupportedEncodingException e) {
-		}
+		} catch (UnsupportedEncodingException e) {}
 		BufferTools.copyIntoByteBuffer(packDataLength(), 0, 4, bytes, 4);
 		BufferTools.copyIntoByteBuffer(packFlags(), 0, 2, bytes, 8);
 	}
-
+	
 	protected byte[] packDataLength() {
 		return BufferTools.packInteger(dataLength);
 	}
@@ -118,19 +118,19 @@ public class ID3v2Frame {
 		bytes[1] = BufferTools.setBit(bytes[1], DATA_LENGTH_INDICATOR_BIT, dataLengthIndicator);
 		return bytes;
 	}
-
+	
 	public String getId() {
 		return id;
 	}
-
+	
 	public int getDataLength() {
 		return dataLength;
 	}
-
+	
 	public int getLength() {
 		return dataLength + HEADER_LENGTH;
 	}
-
+	
 	public byte[] getData() {
 		return data;
 	}
@@ -140,7 +140,7 @@ public class ID3v2Frame {
 		if (data == null) dataLength = 0;
 		else dataLength = data.length;
 	}
-
+	
 	public boolean hasDataLengthIndicator() {
 		return dataLengthIndicator;
 	}
@@ -148,33 +148,33 @@ public class ID3v2Frame {
 	public boolean hasCompression() {
 		return compression;
 	}
-
+	
 	public boolean hasEncryption() {
 		return encryption;
 	}
-
+	
 	public boolean hasGroup() {
 		return group;
 	}
-
+	
 	public boolean hasPreserveFile() {
 		return preserveFile;
 	}
-
+	
 	public boolean hasPreserveTag() {
 		return preserveTag;
 	}
-
+	
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-
+	
 	public boolean hasUnsynchronisation() {
 		return unsynchronisation;
 	}
 	
 	public boolean equals(Object obj) {
-		if (! (obj instanceof ID3v2Frame)) return false;
+		if (!(obj instanceof ID3v2Frame)) return false;
 		if (super.equals(obj)) return true;
 		ID3v2Frame other = (ID3v2Frame) obj;
 		if (dataLength != other.dataLength) return false;
@@ -189,11 +189,11 @@ public class ID3v2Frame {
 		if (id == null) {
 			if (other.id != null) return false;
 		} else if (other.id == null) return false;
-		else if (! id.equals(other.id)) return false;
+		else if (!id.equals(other.id)) return false;
 		if (data == null) {
 			if (other.data != null) return false;
 		} else if (other.data == null) return false;
-		else if (! Arrays.equals(data, other.data)) return false; 
+		else if (!Arrays.equals(data, other.data)) return false;
 		return true;
 	}
 }

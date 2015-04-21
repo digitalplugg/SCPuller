@@ -20,28 +20,13 @@ public class EncodedText {
 	public static final String CHARSET_UTF_16BE = "UTF-16BE";
 	public static final String CHARSET_UTF_8 = "UTF-8";
 	
-	private static final String[] characterSets = {
-		CHARSET_ISO_8859_1,
-		CHARSET_UTF_16,
-		CHARSET_UTF_16BE,
-		CHARSET_UTF_8
-	};
+	private static final String[] characterSets = { CHARSET_ISO_8859_1, CHARSET_UTF_16, CHARSET_UTF_16BE, CHARSET_UTF_8 };
 	
-	private static final byte[] textEncodingFallback = {0, 2, 1, 3};
-
-	private static final byte[][] boms = {
-		{},
-		{(byte)0xff, (byte)0xfe},
-		{(byte) 0xfe, (byte) 0xff},
-		{}
-	};
+	private static final byte[] textEncodingFallback = { 0, 2, 1, 3 };
 	
-	private static final byte[][] terminators = {
-		{0},
-		{0, 0},
-		{0, 0},
-		{0}
-	};
+	private static final byte[][] boms = { {}, { (byte) 0xff, (byte) 0xfe }, { (byte) 0xfe, (byte) 0xff }, {} };
+	
+	private static final byte[][] terminators = { { 0 }, { 0, 0 }, { 0, 0 }, { 0 } };
 	
 	private byte[] value;
 	private byte textEncoding;
@@ -80,11 +65,11 @@ public class EncodedText {
 	}
 	
 	private static byte textEncodingForBytesFromBOM(byte[] value) {
-		if (value.length >= 2 && value[0] == (byte)0xff && value[1] == (byte)0xfe) {
+		if (value.length >= 2 && value[0] == (byte) 0xff && value[1] == (byte) 0xfe) {
 			return TEXT_ENCODING_UTF_16;
-		} else if (value.length >= 2 && value[0] == (byte)0xfe && value[1] == (byte)0xff) {
+		} else if (value.length >= 2 && value[0] == (byte) 0xfe && value[1] == (byte) 0xff) {
 			return TEXT_ENCODING_UTF_16BE;
-		} else if (value.length >= 3 && (value[0] == (byte)0xef && value[1] == (byte)0xbb && value[2] == (byte)0xbf)) {
+		} else if (value.length >= 3 && (value[0] == (byte) 0xef && value[1] == (byte) 0xbb && value[2] == (byte) 0xbf)) {
 			return TEXT_ENCODING_UTF_8;
 		} else {
 			return TEXT_ENCODING_ISO_8859_1;
@@ -101,9 +86,9 @@ public class EncodedText {
 	
 	private void stripBomAndTerminator() {
 		int leadingCharsToRemove = 0;
-		if (value.length >= 2 && ((value[0] == (byte)0xfe && value[1] == (byte)0xff) || (value[0] == (byte)0xff && value[1] == (byte)0xfe))) {
+		if (value.length >= 2 && ((value[0] == (byte) 0xfe && value[1] == (byte) 0xff) || (value[0] == (byte) 0xff && value[1] == (byte) 0xfe))) {
 			leadingCharsToRemove = 2;
-		} else if (value.length >= 3 && (value[0] == (byte)0xef && value[1] == (byte)0xbb && value[2] == (byte)0xbf)) {
+		} else if (value.length >= 3 && (value[0] == (byte) 0xef && value[1] == (byte) 0xbb && value[2] == (byte) 0xbf)) {
 			leadingCharsToRemove = 3;
 		}
 		int trailingCharsToRemove = 0;
@@ -117,7 +102,7 @@ public class EncodedText {
 				}
 			}
 			if (haveTerminator) trailingCharsToRemove = terminator.length;
-		}		
+		}
 		if (leadingCharsToRemove + trailingCharsToRemove > 0) {
 			int newLength = value.length - leadingCharsToRemove - trailingCharsToRemove;
 			byte[] newValue = new byte[newLength];
@@ -131,7 +116,7 @@ public class EncodedText {
 	public byte getTextEncoding() {
 		return textEncoding;
 	}
-
+	
 	public void setTextEncoding(byte textEncoding) throws CharacterCodingException {
 		setTextEncoding(textEncoding, true);
 	}
@@ -144,7 +129,7 @@ public class EncodedText {
 			this.value = transcodedBytes;
 		}
 	}
-
+	
 	public byte[] getTerminator() {
 		return terminators[textEncoding];
 	}
@@ -193,17 +178,17 @@ public class EncodedText {
 			return null;
 		}
 	}
-
+	
 	public String getCharacterSet() {
 		return characterSetForTextEncoding(textEncoding);
 	}
 	
 	public boolean equals(Object obj) {
-		if (! (obj instanceof EncodedText)) return false;
+		if (!(obj instanceof EncodedText)) return false;
 		if (super.equals(obj)) return true;
 		EncodedText other = (EncodedText) obj;
 		if (textEncoding != other.textEncoding) return false;
-		if (! Arrays.equals(value, other.value)) return false;
+		if (!Arrays.equals(value, other.value)) return false;
 		return true;
 	}
 	

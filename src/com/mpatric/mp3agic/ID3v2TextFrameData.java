@@ -17,7 +17,7 @@ public class ID3v2TextFrameData extends AbstractID3v2FrameData {
 		super(unsynchronisation);
 		synchroniseAndUnpackFrameData(bytes);
 	}
-
+	
 	protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
 		text = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 1, bytes.length - 1));
 	}
@@ -38,23 +38,23 @@ public class ID3v2TextFrameData extends AbstractID3v2FrameData {
 		if (text != null) length += text.toBytes(true, false).length;
 		return length;
 	}
-
+	
 	public EncodedText getText() {
 		return text;
 	}
-
+	
 	public void setText(EncodedText text) {
 		this.text = text;
 	}
 	
 	public boolean equals(Object obj) {
-		if (! (obj instanceof ID3v2TextFrameData)) return false;
-		if (! super.equals(obj)) return false;
+		if (!(obj instanceof ID3v2TextFrameData)) return false;
+		if (!super.equals(obj)) return false;
 		ID3v2TextFrameData other = (ID3v2TextFrameData) obj;
 		if (text == null) {
 			if (other.text != null) return false;
 		} else if (other.text == null) return false;
-		else if (! text.equals(other.text)) return false;
+		else if (!text.equals(other.text)) return false;
 		return true;
 	}
 }

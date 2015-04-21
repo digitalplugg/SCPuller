@@ -1,14 +1,14 @@
 package com.mpatric.mp3agic;
 
 public class ID3v24Tag extends AbstractID3v2Tag {
-
+	
 	public static final String VERSION = "4.0";
-
+	
 	public ID3v24Tag() {
 		super();
 		version = VERSION;
 	}
-
+	
 	public ID3v24Tag(byte[] buffer) throws NoSuchTagException, UnsupportedTagException, InvalidDataException {
 		super(buffer);
 	}
@@ -23,7 +23,7 @@ public class ID3v24Tag extends AbstractID3v2Tag {
 	protected void packFlags(byte[] bytes, int offset) {
 		bytes[offset + FLAGS_OFFSET] = BufferTools.setBit(bytes[offset + FLAGS_OFFSET], UNSYNCHRONISATION_BIT, unsynchronisation);
 		bytes[offset + FLAGS_OFFSET] = BufferTools.setBit(bytes[offset + FLAGS_OFFSET], EXTENDED_HEADER_BIT, extendedHeader);
-		bytes[offset + FLAGS_OFFSET] = BufferTools.setBit(bytes[offset + FLAGS_OFFSET], EXPERIMENTAL_BIT, experimental);		
+		bytes[offset + FLAGS_OFFSET] = BufferTools.setBit(bytes[offset + FLAGS_OFFSET], EXPERIMENTAL_BIT, experimental);
 		bytes[offset + FLAGS_OFFSET] = BufferTools.setBit(bytes[offset + FLAGS_OFFSET], FOOTER_BIT, footer);
 	}
 	
